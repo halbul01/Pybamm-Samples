@@ -70,11 +70,13 @@ def charge_summary(sol, Q_nom, initial_soc=0, t_check=10, soc_check=80):
     dt = np.diff(t)
     t_below_0 = np.sum(dt[u[:-1] < 0])
 
-    return {
-        f"SoC at {t_check} min [%]": round(np.interp(t_check, t, soc), 2),
-        f"Time to {soc_check}% SoC [min]": round(t_soc, 2),
-        "Total time [min]": round(t[-1], 2),
-        "Final SoC [%]": round(soc[-1], 2),
-        "Min anode potential [mV]": round(u.min(), 2),
-        "Time below 0 mV [min]": round(t_below_0, 2),
+    result = {
+        f"SoC at {t_check} min [%]": np.interp(t_check, t, soc),
+        f"Time to {soc_check}% SoC [min]": t_soc,
+        "Total time [min]": t[-1],
+        "Final SoC [%]": soc[-1],
+        "Min anode potential [mV]": u.min(),
+        "Time below 0 mV [min]": t_below_0,
     }
+    # Plain Python floats, so the dict prints as 30.9 instead of np.float64(30.9)
+    return {k: round(float(v), 2) for k, v in result.items()}
